@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+const isImageUrl = require('is-image-url');
 
 (async () => {
 
@@ -27,7 +28,19 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   // RETURNS
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
-  /**************************************************************************** */
+  app.get( "/filteredimage", async ( req, res ) => {
+    let image_url = req.query.image_url;
+    if (!image_url) {
+      return res.status(400).send({ message: 'Image url is required' });
+    }
+    if (!isImageUrl(image_url)) {
+      return res.status(400).send({ message: 'Image url is not valid' });
+    }
+    let filtered_image_url = await filterImageFromURL(image_url);
+    res.sendFile(filtered_image_url , () =>
+        deleteLocalFiles([filtered_image_url])
+    );
+  });
 
   //! END @TODO1
   
