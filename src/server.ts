@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+const isImageUrl = require('is-image-url');
 
 (async () => {
 
@@ -31,6 +32,9 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
     let image_url = req.query.image_url;
     if (!image_url) {
       return res.status(400).send({ message: 'Image url is required' });
+    }
+    if (!isImageUrl(image_url)) {
+      return res.status(400).send({ message: 'Image url is not valid' });
     }
     let filtered_image_url = await filterImageFromURL(image_url);
     res.sendFile(filtered_image_url , () =>
