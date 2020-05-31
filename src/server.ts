@@ -2,6 +2,7 @@ import express, {Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 const isImageUrl = require('is-image-url');
+import * as HttpStatus from 'http-status-codes';
 
 (async () => {
 
@@ -31,10 +32,10 @@ const isImageUrl = require('is-image-url');
   app.get( "/filteredimage", async ( req:Request, res:Response ) => {
     let image_url = req.query.image_url;
     if (!image_url) {
-      return res.status(400).send({ message: 'Image url is required' });
+      return res.status(HttpStatus.UNPROCESSABLE_ENTITY).send({ message: 'Image url is required' });
     }
     if (!isImageUrl(image_url)) {
-      return res.status(400).send({ message: 'Image url is not valid' });
+      return res.status(HttpStatus.UNPROCESSABLE_ENTITY).send({ message: 'Image url is not valid' });
     }
     let filtered_image_url = await filterImageFromURL(image_url);
     res.sendFile(filtered_image_url , () =>
